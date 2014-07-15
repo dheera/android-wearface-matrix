@@ -1,6 +1,10 @@
 package net.dheera.wearfacematrix;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,22 +14,37 @@ import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.TextView;
 
 import java.util.Calendar;
 import java.util.Random;
 
 public class FaceActivity extends Activity implements SurfaceHolder.Callback {
-    final private boolean D = true;
+    final private boolean D = false;
     final private String TAG = "WearFaceMatrix";
     final private FaceActivity self = this;
 
-    private DrawTask mDrawTask;
+    private final static IntentFilter intentFilter;
+
+    private DrawTask mDrawTask = null;
     private SurfaceHolder mSurfaceHolder = null;
     private Canvas drawCanvas = null;
 
-    // widgets
+    static {
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_TIME_TICK);
+        intentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
+        intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
+    }
+
     private SurfaceView mSurfaceView;
+
+    public BroadcastReceiver timeInfoReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context arg0, Intent intent) {
+            if(D) Log.d(TAG, "time changed");
+            if(mDrawTask != null) mDrawTask.drawPause();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,30 +60,28 @@ public class FaceActivity extends Activity implements SurfaceHolder.Callback {
                 mSurfaceView.getHolder().addCallback(self);
             }
         });
+
         mDrawTask = new DrawTask();
         mDrawTask.start();
+
+        timeInfoReceiver.onReceive(this, registerReceiver(null, intentFilter));
+        registerReceiver(timeInfoReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(timeInfoReceiver);
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         mSurfaceHolder = holder;
-        /*
-        drawCanvas = holder.lockCanvas();
-        if (drawCanvas != null) {
-            drawCanvas.drawRGB(255, 30, 30);
-            // holder.unlockCanvasAndPost(drawCanvas);
-        }*/
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int frmt, int w, int h) {
         mSurfaceHolder = holder;
-        /*
-        drawCanvas = holder.lockCanvas();
-        if (drawCanvas != null) {
-            drawCanvas.drawRGB(255, 30, 30);
-            // holder.unlockCanvasAndPost(drawCanvas);
-        }*/
     }
 
     @Override
@@ -77,7 +94,6 @@ public class FaceActivity extends Activity implements SurfaceHolder.Callback {
         //  onPause();
         if(D) Log.d(TAG, "onPause();");
         super.onPause();
-
         mDrawTask.setPaused();
     }
 
@@ -86,7 +102,6 @@ public class FaceActivity extends Activity implements SurfaceHolder.Callback {
         //  onResume();
         if(D) Log.d(TAG, "onResume();");
         super.onResume();
-
         mDrawTask.setUnpaused();
     }
 
@@ -271,33 +286,36 @@ public class FaceActivity extends Activity implements SurfaceHolder.Callback {
             }
         }
 
+        public void drawPause() {
+            int i, j;
+            updateTime();
+            if (mSurfaceHolder != null && (drawCanvas = mSurfaceHolder.lockCanvas()) != null) {
+                drawCanvas.drawRGB(0, 0, 0);
+                for(i = 2; i < numRows - 2; i++) {
+                    for(j = 7; j < 15; j++) {
+                        if(timeMask[i][j]) {
+                            drawCanvas.drawRect(xOffset + i * charWidth - 1, j * charWidth + 2, xOffset + i*charWidth + charWidth - 3, j*charWidth + charWidth,  paintTimePause);
+                        }
+                    }
+                }
+                mSurfaceHolder.unlockCanvasAndPost(drawCanvas);
+            }
+        }
+
         public void run() {
             while(true) {
-                boolean needToDraw = updateTime();
-                if ((!paused || needToDraw) && mSurfaceHolder != null && (drawCanvas = mSurfaceHolder.lockCanvas()) != null) {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
+                if(!paused) {
+                    updateTime();
+                    if (mSurfaceHolder != null && (drawCanvas = mSurfaceHolder.lockCanvas()) != null) {
+                        Random random = new Random();
+                        drawCanvas.drawRGB(0, 0, 0);
 
-                        }
-                    });
-                    Random random = new Random();
-                    drawCanvas.drawRGB(0, 0, 0);
-
-                    int i, j;
-                    if(paused) {
-                        for(i = 2; i < numRows - 2; i++) {
-                            for(j = 7; j < 15; j++) {
-                                if(timeMask[i][j]) {
-                                    drawCanvas.drawRect(xOffset + i * charWidth - 1, j * charWidth + 2, xOffset + i*charWidth + charWidth - 3, j*charWidth + charWidth,  paintTimePause);
-                                }
-                            }
-                        }
-                    } else {
+                        int i, j;
                         for (i = 0; i < numRows; i++) {
-                            for (j = numRows-1; j > 0; j--) {
-                                if(theIntensities[i][j] == 7 || (j<5 && random.nextInt(24)==0)) {
+                            for (j = numRows - 1; j > 0; j--) {
+                                if (theIntensities[i][j] == 7 || (j < 5 && random.nextInt(24) == 0)) {
                                     drawCanvas.drawText(theMatrix[i][j], xOffset + i * charWidth, j * charWidth, paints[7]);
-                                    if(random.nextInt(2)==0) {
+                                    if (random.nextInt(2) == 0) {
                                         if (j < numRows - 1) {
                                             theIntensities[i][j + 1] = 7;
                                             theMatrix[i][j + 1] = matrixChars[random.nextInt(matrixChars.length)];
@@ -306,17 +324,17 @@ public class FaceActivity extends Activity implements SurfaceHolder.Callback {
                                     }
                                 } else {
                                     drawCanvas.drawText(theMatrix[i][j], xOffset + i * charWidth, j * charWidth, paints[theIntensities[i][j]]);
-                                    theIntensities[i][j]+=random.nextInt(5)-3;
-                                    if(theIntensities[i][j]<0) theIntensities[i][j]=0;
-                                    if(theIntensities[i][j]>=7) theIntensities[i][j]=6;
+                                    theIntensities[i][j] += random.nextInt(5) - 3;
+                                    if (theIntensities[i][j] < 0) theIntensities[i][j] = 0;
+                                    if (theIntensities[i][j] >= 7) theIntensities[i][j] = 6;
                                 }
-                                if(timeMask[i][j]) {
-                                    drawCanvas.drawRect(xOffset + i * charWidth - 1, j * charWidth + 2, xOffset + i*charWidth + charWidth - 3, j*charWidth + charWidth,  paintTime);
+                                if (timeMask[i][j]) {
+                                    drawCanvas.drawRect(xOffset + i * charWidth - 1, j * charWidth + 2, xOffset + i * charWidth + charWidth - 3, j * charWidth + charWidth, paintTime);
                                 }
                             }
                         }
+                        mSurfaceHolder.unlockCanvasAndPost(drawCanvas);
                     }
-                    mSurfaceHolder.unlockCanvasAndPost(drawCanvas);
                 }
                 try {
                     if(paused) Thread.sleep(5000);
@@ -329,13 +347,11 @@ public class FaceActivity extends Activity implements SurfaceHolder.Callback {
 
         public void setPaused() {
             paused = true;
-            oldMinute = -1;
-            this.interrupt();
+            this.drawPause();
         }
 
         public void setUnpaused() {
             int i, j;
-            oldMinute = -1;
             paused = false;
             for(i = 0; i < numRows; i++) {
                 for (j = 0; j < numRows; j++) {
@@ -344,5 +360,6 @@ public class FaceActivity extends Activity implements SurfaceHolder.Callback {
             }
             this.interrupt();
         }
+
     }
 }

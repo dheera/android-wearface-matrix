@@ -8,8 +8,8 @@ android {
         applicationId "net.dheera.wearfacematrix"
         minSdkVersion 14
         targetSdkVersion 20
-        versionCode 2
-        versionName "1.1"
+        versionCode 3
+        versionName "1.2"
     }
     aaptOptions {
         noCompress "apk"
