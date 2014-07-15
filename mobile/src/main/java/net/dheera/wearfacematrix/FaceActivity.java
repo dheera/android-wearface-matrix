@@ -1,4 +1,4 @@
-package wearmatrixface.net.dheera.wearfacematrix;
+package net.dheera.wearfacematrix;
 
 import android.app.Activity;
 import android.os.Bundle;
