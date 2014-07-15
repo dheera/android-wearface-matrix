@@ -361,6 +361,7 @@ public class FaceActivity extends Activity implements SurfaceHolder.Callback {
                     theIntensities[i][j]=0;
                 }
             }
+            synchronized(signal) { signal.notify(); }
             this.interrupt();
         }
 

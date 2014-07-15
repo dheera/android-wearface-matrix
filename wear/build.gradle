@@ -9,8 +9,8 @@ android {
         applicationId "net.dheera.wearfacematrix"
         minSdkVersion 20
         targetSdkVersion 20
-        versionCode 4
-        versionName "1.3"
+        versionCode 5
+        versionName "1.4"
     }
     buildTypes {
         release {
