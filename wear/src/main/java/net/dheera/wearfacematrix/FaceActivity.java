@@ -304,41 +304,44 @@ public class FaceActivity extends Activity implements SurfaceHolder.Callback {
 
         public void run() {
             while(true) {
-                if(!paused) {
-                    updateTime();
-                    if (mSurfaceHolder != null && (drawCanvas = mSurfaceHolder.lockCanvas()) != null) {
-                        Random random = new Random();
-                        drawCanvas.drawRGB(0, 0, 0);
+                while(paused) {
+                    try { synchronized(signal) { signal.wait(); } }
+                    catch(InterruptedException e) { }
+                }
+                updateTime();
+                if (mSurfaceHolder != null && (drawCanvas = mSurfaceHolder.lockCanvas()) != null) {
+                    Random random = new Random();
+                    drawCanvas.drawRGB(0, 0, 0);
 
-                        int i, j;
-                        for (i = 0; i < numRows; i++) {
-                            for (j = numRows - 1; j > 0; j--) {
-                                if (theIntensities[i][j] == 7 || (j < 5 && random.nextInt(24) == 0)) {
-                                    drawCanvas.drawText(theMatrix[i][j], xOffset + i * charWidth, j * charWidth, paints[7]);
-                                    if (random.nextInt(2) == 0) {
-                                        if (j < numRows - 1) {
-                                            theIntensities[i][j + 1] = 7;
-                                            theMatrix[i][j + 1] = matrixChars[random.nextInt(matrixChars.length)];
-                                        }
-                                        theIntensities[i][j] = 6;
+                    int i, j;
+                    for (i = 0; i < numRows; i++) {
+                        for (j = numRows - 1; j > 0; j--) {
+                            if (theIntensities[i][j] == 7 || (j < 5 && random.nextInt(24) == 0)) {
+                                drawCanvas.drawText(theMatrix[i][j], xOffset + i * charWidth, j * charWidth, paints[7]);
+                                if (random.nextInt(2) == 0) {
+                                    if (j < numRows - 1) {
+                                        theIntensities[i][j + 1] = 7;
+                                        theMatrix[i][j + 1] = matrixChars[random.nextInt(matrixChars.length)];
                                     }
-                                } else {
+                                    theIntensities[i][j] = 6;
+                                }
+                            } else {
+                                if(theIntensities[i][j]>0) {
                                     drawCanvas.drawText(theMatrix[i][j], xOffset + i * charWidth, j * charWidth, paints[theIntensities[i][j]]);
-                                    theIntensities[i][j] += random.nextInt(5) - 3;
-                                    if (theIntensities[i][j] < 0) theIntensities[i][j] = 0;
-                                    if (theIntensities[i][j] >= 7) theIntensities[i][j] = 6;
                                 }
-                                if (timeMask[i][j]) {
-                                    drawCanvas.drawRect(xOffset + i * charWidth - 1, j * charWidth + 2, xOffset + i * charWidth + charWidth - 3, j * charWidth + charWidth, paintTime);
-                                }
+                                theIntensities[i][j] += random.nextInt(5) - 3;
+                                if (theIntensities[i][j] < 0) theIntensities[i][j] = 0;
+                                if (theIntensities[i][j] >= 7) theIntensities[i][j] = 6;
+                            }
+                            if (timeMask[i][j]) {
+                                drawCanvas.drawRect(xOffset + i * charWidth - 1, j * charWidth + 2, xOffset + i * charWidth + charWidth - 3, j * charWidth + charWidth, paintTime);
                             }
                         }
-                        mSurfaceHolder.unlockCanvasAndPost(drawCanvas);
                     }
+                    mSurfaceHolder.unlockCanvasAndPost(drawCanvas);
                 }
                 try {
-                    if(paused) Thread.sleep(5000);
-                    else Thread.sleep(30);
+                    Thread.sleep(30);
                 } catch (Exception e) {
                     // interrupted, no problem
                 }
