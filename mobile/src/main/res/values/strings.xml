@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">WearFaceMatrix</string>
+    <string name="hello_world">This is a watch face for Android Wear watches. If you have an Android Wear device you should be able to select it already.</string>
+    <string name="action_settings">Settings</string>
+
+</resources>
