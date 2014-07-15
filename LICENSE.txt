@@ -1,4 +1,4 @@
-Android Wear Camera Remote
+"Matrix" Watch Face for Android Wear
 by Dheera Venkatraman <dheera at dheera dot net>
 http://dheera.net/
 
