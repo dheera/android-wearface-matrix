@@ -169,8 +169,8 @@ public class FaceActivity extends Activity implements SurfaceHolder.Callback {
                         {false, false, false, true },
                         {false, false, false, true },
                         {false, false, true,  false},
-                        {false, false, true,  true },
-                        {false, false, true,  true },
+                        {false, false, true,  false},
+                        {false, false, true,  false},
                 },
                 { // 8
                         {false, true , true , false},
