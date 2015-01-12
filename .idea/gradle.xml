@@ -7,9 +7,9 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="$USER_HOME$/Dropbox/docs/code/android-wearfacematrix2" />
-            <option value="$USER_HOME$/Dropbox/docs/code/android-wearfacematrix2/mobile" />
-            <option value="$USER_HOME$/Dropbox/docs/code/android-wearfacematrix2/wear" />
+            <option value="$USER_HOME$/Dropbox/docs/code/android-wearface-matrix" />
+            <option value="$USER_HOME$/Dropbox/docs/code/android-wearface-matrix/mobile" />
+            <option value="$USER_HOME$/Dropbox/docs/code/android-wearface-matrix/wear" />
           </set>
         </option>
       </GradleProjectSettings>

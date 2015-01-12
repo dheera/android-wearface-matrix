@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">wearfacematrix</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">Matrix Watch Face</string>
+    <string name="hello_world">Please select this watch face directly on your Android Wear device or from the Android Wear application. It may take a few minutes to show up. Thanks!</string>
     <string name="action_settings">Settings</string>
 
 </resources>

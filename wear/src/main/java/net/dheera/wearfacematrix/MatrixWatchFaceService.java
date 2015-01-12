@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
+import android.text.format.DateFormat;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -98,10 +99,6 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
 
             /*Point size = new Point();
             getWindowManager().getDefaultDisplay().getSize(size);*/
-            int screenWidth = 320;
-
-            mCharWidth = screenWidth / mSettingsNumRows + 1;
-            mXOffset = (screenWidth - mCharWidth * mSettingsNumRows)/2;
 
             int i, j;
             for(i = 0; i <=5 ; i++) {
@@ -128,7 +125,6 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
 
             mDigitalActiveTimePaint = new Paint();
             mDigitalActiveTimePaint.setColor(Color.rgb(255, 255, 255));
-            mDigitalActiveTimePaint.setTextSize((int) (screenWidth / 3.5));
             mDigitalActiveTimePaint.setTextAlign(Paint.Align.CENTER);
             mDigitalActiveTimePaint.setAntiAlias(true);
             // mDigitalActiveTimePaint.setStyle(Paint.Style.STROKE);
@@ -138,7 +134,6 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
 
             mDigitalAmbientTimePaint = new Paint();
             mDigitalAmbientTimePaint.setColor(Color.rgb(255, 255, 255));
-            mDigitalAmbientTimePaint.setTextSize((int) (screenWidth / 3.5));
             mDigitalAmbientTimePaint.setTextAlign(Paint.Align.CENTER);
             mDigitalAmbientTimePaint.setAntiAlias(true);
             mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "miltown2.ttf"));
@@ -238,6 +233,12 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
             int width = bounds.width();
             int height = bounds.height();
 
+            mCharWidth = width / mSettingsNumRows + 1;
+            mXOffset = (width - mCharWidth * mSettingsNumRows)/2;
+
+            mDigitalActiveTimePaint.setTextSize((int) (width / 3.5));
+            mDigitalAmbientTimePaint.setTextSize((int) (width / 3.5));
+
             if (!isInAmbientMode()) {
                 // Draw the background, scaled to fit.
                 if (mBackgroundScaledBitmap == null
@@ -323,11 +324,13 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
                 }
             }
 
+            int hourMod = (DateFormat.is24HourFormat(getBaseContext())) ? 24 : 12;
+
             if (!isInAmbientMode()) {
-                String timeString = String.format("%02d:%02d", mTime.hour, mTime.minute);
+                String timeString = String.format("%02d:%02d", mTime.hour % hourMod, mTime.minute);
                 canvas.drawText(timeString, centerX, centerY + mDigitalActiveTimePaint.getTextSize() / 3, mDigitalActiveTimePaint);
             } else {
-                String timeString = String.format("%02d:%02d", mTime.hour, mTime.minute);
+                String timeString = String.format("%02d:%02d", mTime.hour % hourMod, mTime.minute);
                 canvas.drawText(timeString, centerX, centerY + mDigitalAmbientTimePaint.getTextSize() / 3, mDigitalAmbientTimePaint);
             }
 
