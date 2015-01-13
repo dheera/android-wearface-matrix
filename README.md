@@ -1,4 +1,4 @@
-"The Matrix" watch face for Android Wear
+"The Matrix" face for Android Wear
 ========================================
 
 By Dheera Venkatraman  
