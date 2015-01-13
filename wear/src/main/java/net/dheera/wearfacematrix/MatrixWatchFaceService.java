@@ -324,13 +324,17 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
                 }
             }
 
-            int hourMod = (DateFormat.is24HourFormat(getBaseContext())) ? 24 : 12;
+            int displayHour = mTime.hour;
+            if(!DateFormat.is24HourFormat(getBaseContext())) {
+                displayHour = displayHour % 12;
+                if(displayHour == 0) displayHour = 12;
+            }
 
             if (!isInAmbientMode()) {
-                String timeString = String.format("%02d:%02d", mTime.hour % hourMod, mTime.minute);
+                String timeString = String.format("%02d:%02d", displayHour, mTime.minute);
                 canvas.drawText(timeString, centerX, centerY + mDigitalActiveTimePaint.getTextSize() / 3, mDigitalActiveTimePaint);
             } else {
-                String timeString = String.format("%02d:%02d", mTime.hour % hourMod, mTime.minute);
+                String timeString = String.format("%02d:%02d", displayHour, mTime.minute);
                 canvas.drawText(timeString, centerX, centerY + mDigitalAmbientTimePaint.getTextSize() / 3, mDigitalAmbientTimePaint);
             }
 
