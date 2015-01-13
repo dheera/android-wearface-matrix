@@ -11,5 +11,4 @@ This project is released under the [GNU General Public License](http://www.gnu.o
 Check it out on the Play Store:  
 https://play.google.com/store/apps/details?id=net.dheera.wearfacematrix  
 
-![App image](http://static.dheera.net/images/projects/android-wearfaces/matrix-1.jpg)  
-![App image](http://static.dheera.net/images/projects/android-wearfaces/matrix-2.jpg)  
+![App image](https://raw.githubusercontent.com/dheera/android-wearface-matrix/master/art/watch.png =400x)
