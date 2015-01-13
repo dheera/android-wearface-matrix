@@ -1,8 +1,6 @@
-android-wearfacematrix
-======================
+"The Matrix" watch face for Android Wear
+========================================
 
-"The Matrix" watch face for Android Wear.  
-  
 By Dheera Venkatraman  
 http://dheera.net/  
   
