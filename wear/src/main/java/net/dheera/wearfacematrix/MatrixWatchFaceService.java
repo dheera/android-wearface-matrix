@@ -5,14 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
@@ -77,9 +74,6 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
 
         Paint mBackgroundPaint;
 
-        Bitmap mBackgroundBitmap;
-        Bitmap mBackgroundScaledBitmap;
-
         @Override
         public void onCreate(SurfaceHolder holder) {
             if (Log.isLoggable(TAG, Log.DEBUG)) {
@@ -94,8 +88,6 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
                     .build());
 
             Resources resources = MatrixWatchFaceService.this.getResources();
-            Drawable backgroundDrawable = resources.getDrawable(R.drawable.bg);
-            mBackgroundBitmap = ((BitmapDrawable) backgroundDrawable).getBitmap();
 
             /*Point size = new Point();
             getWindowManager().getDefaultDisplay().getSize(size);*/
@@ -228,7 +220,7 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
             }
             long now = System.currentTimeMillis();
             mTime.set(now);
-            int milliseconds = (int) (now % 1000);
+            //int milliseconds = (int) (now % 1000);
 
             int width = bounds.width();
             int height = bounds.height();
@@ -239,63 +231,11 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
             mDigitalActiveTimePaint.setTextSize((int) (width / 3.5));
             mDigitalAmbientTimePaint.setTextSize((int) (width / 3.5));
 
-            if (!isInAmbientMode()) {
-                // Draw the background, scaled to fit.
-                if (mBackgroundScaledBitmap == null
-                        || mBackgroundScaledBitmap.getWidth() != width
-                        || mBackgroundScaledBitmap.getHeight() != height) {
-                    mBackgroundScaledBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap,
-                            width, height, true /* filter */);
-                }
-                canvas.drawBitmap(mBackgroundScaledBitmap, 0, 0, null);
-            } else {
-                canvas.drawRect(0,0,width,height, mBackgroundPaint);
-            }
-
             // Find the center. Ignore the window insets so that, on round watches with a
             // "chin", the watch face is centered on the entire screen, not just the usable
             // portion.
             float centerX = width / 2f;
             float centerY = height / 2f;
-
-            /*
-            // Draw the ticks.
-            float innerTickRadius = centerX - 10;
-            float outerTickRadius = centerX;
-            for (int tickIndex = 0; tickIndex < 12; tickIndex++) {
-                float tickRot = (float) (tickIndex * Math.PI * 2 / 12);
-                float innerX = (float) Math.sin(tickRot) * innerTickRadius;
-                float innerY = (float) -Math.cos(tickRot) * innerTickRadius;
-                float outerX = (float) Math.sin(tickRot) * outerTickRadius;
-                float outerY = (float) -Math.cos(tickRot) * outerTickRadius;
-                canvas.drawLine(centerX + innerX, centerY + innerY,
-                        centerX + outerX, centerY + outerY, mAnalogTickPaint);
-            }
-
-            float seconds = mTime.second + milliseconds / 1000f;
-            float secRot = seconds / 30f * (float) Math.PI;
-            int minutes = mTime.minute;
-            float minRot = minutes / 30f * (float) Math.PI;
-            float hrRot = ((mTime.hour + (minutes / 60f)) / 6f ) * (float) Math.PI;
-
-            float secLength = centerX - 20;
-            float minLength = centerX - 40;
-            float hrLength = centerX - 80;
-
-            if (!isInAmbientMode()) {
-                float secX = (float) Math.sin(secRot) * secLength;
-                float secY = (float) -Math.cos(secRot) * secLength;
-                canvas.drawLine(centerX, centerY, centerX + secX, centerY + secY, mAnalogSecondPaint);
-            }
-
-            float minX = (float) Math.sin(minRot) * minLength;
-            float minY = (float) -Math.cos(minRot) * minLength;
-            canvas.drawLine(centerX, centerY, centerX + minX, centerY + minY, mAnalogMinutePaint);
-
-            float hrX = (float) Math.sin(hrRot) * hrLength;
-            float hrY = (float) -Math.cos(hrRot) * hrLength;
-            canvas.drawLine(centerX, centerY, centerX + hrX, centerY + hrY, mAnalogHourPaint);
-            */
 
             // Draw the matrix background
 
