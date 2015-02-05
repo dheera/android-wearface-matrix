@@ -29,6 +29,11 @@
             <meta-data
                 android:name="com.google.android.clockwork.home.preview_circular"
                 android:resource="@drawable/preview_analog_circular" />
+            <meta-data
+                android:name=
+                    "com.google.android.wearable.watchface.companionConfigurationAction"
+                android:value=
+                    "net.dheera.wearfacematrix.MAIN" />
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
