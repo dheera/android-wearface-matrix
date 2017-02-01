@@ -5,11 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
@@ -74,6 +77,9 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
 
         Paint mBackgroundPaint;
 
+        Bitmap mBackgroundBitmap;
+        Bitmap mBackgroundScaledBitmap;
+
         @Override
         public void onCreate(SurfaceHolder holder) {
             if (Log.isLoggable(TAG, Log.DEBUG)) {
@@ -88,6 +94,8 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
                     .build());
 
             Resources resources = MatrixWatchFaceService.this.getResources();
+            Drawable backgroundDrawable = resources.getDrawable(R.drawable.bg);
+            mBackgroundBitmap = ((BitmapDrawable) backgroundDrawable).getBitmap();
 
             /*Point size = new Point();
             getWindowManager().getDefaultDisplay().getSize(size);*/
@@ -230,6 +238,19 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
 
             mDigitalActiveTimePaint.setTextSize((int) (width / 3.5));
             mDigitalAmbientTimePaint.setTextSize((int) (width / 3.5));
+
+            if (!isInAmbientMode()) {
+                // Draw the background, scaled to fit.
+                if (mBackgroundScaledBitmap == null
+                        || mBackgroundScaledBitmap.getWidth() != width
+                        || mBackgroundScaledBitmap.getHeight() != height) {
+                    mBackgroundScaledBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap,
+                            width, height, true /* filter */);
+                }
+                canvas.drawBitmap(mBackgroundScaledBitmap, 0, 0, null);
+            } else {
+                canvas.drawRect(0,0,width,height, mBackgroundPaint);
+            }
 
             // Find the center. Ignore the window insets so that, on round watches with a
             // "chin", the watch face is centered on the entire screen, not just the usable
