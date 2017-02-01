@@ -36,16 +36,11 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
     private class Engine extends CanvasWatchFaceService.Engine {
 
         private final int mSettingsNumRows = 23;
-        private int mMatrixBaseColor = Color.GREEN;
 
         private Random random = new Random();
 
-        Paint mAnalogHourPaint;
-        Paint mAnalogMinutePaint;
-        Paint mAnalogSecondPaint;
         Paint mDigitalActiveTimePaint;
         Paint mDigitalAmbientTimePaint;
-        Paint mAnalogTickPaint;
         private Paint[] mMatrixPaints = new Paint[8];
 
         boolean mMute;
@@ -148,29 +143,6 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setARGB(255, 0, 0, 0);
 
-            mAnalogHourPaint = new Paint();
-            mAnalogHourPaint.setARGB(255, 200, 200, 200);
-            mAnalogHourPaint.setStrokeWidth(5.f);
-            mAnalogHourPaint.setAntiAlias(true);
-            mAnalogHourPaint.setStrokeCap(Paint.Cap.ROUND);
-
-            mAnalogMinutePaint = new Paint();
-            mAnalogMinutePaint.setARGB(255, 200, 200, 200);
-            mAnalogMinutePaint.setStrokeWidth(3.f);
-            mAnalogMinutePaint.setAntiAlias(true);
-            mAnalogMinutePaint.setStrokeCap(Paint.Cap.ROUND);
-
-            mAnalogSecondPaint = new Paint();
-            mAnalogSecondPaint.setARGB(255, 255, 0, 0);
-            mAnalogSecondPaint.setStrokeWidth(2.f);
-            mAnalogSecondPaint.setAntiAlias(true);
-            mAnalogSecondPaint.setStrokeCap(Paint.Cap.ROUND);
-
-            mAnalogTickPaint = new Paint();
-            mAnalogTickPaint.setARGB(100, 255, 255, 255);
-            mAnalogTickPaint.setStrokeWidth(2.f);
-            mAnalogTickPaint.setAntiAlias(true);
-
             mTime = new Time();
         }
 
@@ -200,10 +172,6 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
             }
             if (mLowBitAmbient) {
                 boolean antiAlias = !inAmbientMode;
-                mAnalogHourPaint.setAntiAlias(antiAlias);
-                mAnalogMinutePaint.setAntiAlias(antiAlias);
-                mAnalogSecondPaint.setAntiAlias(antiAlias);
-                mAnalogTickPaint.setAntiAlias(antiAlias);
             }
             invalidate();
         }
@@ -214,9 +182,6 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
             boolean inMuteMode = (interruptionFilter == WatchFaceService.INTERRUPTION_FILTER_NONE);
             if (mMute != inMuteMode) {
                 mMute = inMuteMode;
-                mAnalogHourPaint.setAlpha(inMuteMode ? 100 : 255);
-                mAnalogMinutePaint.setAlpha(inMuteMode ? 100 : 255);
-                mAnalogSecondPaint.setAlpha(inMuteMode ? 80 : 255);
                 invalidate();
             }
         }
