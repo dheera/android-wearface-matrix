@@ -5,11 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
@@ -33,16 +36,11 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
     private class Engine extends CanvasWatchFaceService.Engine {
 
         private final int mSettingsNumRows = 23;
-        private int mMatrixBaseColor = Color.GREEN;
 
         private Random random = new Random();
 
-        Paint mAnalogHourPaint;
-        Paint mAnalogMinutePaint;
-        Paint mAnalogSecondPaint;
         Paint mDigitalActiveTimePaint;
         Paint mDigitalAmbientTimePaint;
-        Paint mAnalogTickPaint;
         private Paint[] mMatrixPaints = new Paint[8];
 
         boolean mMute;
@@ -74,6 +72,9 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
 
         Paint mBackgroundPaint;
 
+        Bitmap mBackgroundBitmap;
+        Bitmap mBackgroundScaledBitmap;
+
         @Override
         public void onCreate(SurfaceHolder holder) {
             if (Log.isLoggable(TAG, Log.DEBUG)) {
@@ -88,6 +89,8 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
                     .build());
 
             Resources resources = MatrixWatchFaceService.this.getResources();
+            Drawable backgroundDrawable = resources.getDrawable(R.drawable.bg);
+            mBackgroundBitmap = ((BitmapDrawable) backgroundDrawable).getBitmap();
 
             /*Point size = new Point();
             getWindowManager().getDefaultDisplay().getSize(size);*/
@@ -140,29 +143,6 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setARGB(255, 0, 0, 0);
 
-            mAnalogHourPaint = new Paint();
-            mAnalogHourPaint.setARGB(255, 200, 200, 200);
-            mAnalogHourPaint.setStrokeWidth(5.f);
-            mAnalogHourPaint.setAntiAlias(true);
-            mAnalogHourPaint.setStrokeCap(Paint.Cap.ROUND);
-
-            mAnalogMinutePaint = new Paint();
-            mAnalogMinutePaint.setARGB(255, 200, 200, 200);
-            mAnalogMinutePaint.setStrokeWidth(3.f);
-            mAnalogMinutePaint.setAntiAlias(true);
-            mAnalogMinutePaint.setStrokeCap(Paint.Cap.ROUND);
-
-            mAnalogSecondPaint = new Paint();
-            mAnalogSecondPaint.setARGB(255, 255, 0, 0);
-            mAnalogSecondPaint.setStrokeWidth(2.f);
-            mAnalogSecondPaint.setAntiAlias(true);
-            mAnalogSecondPaint.setStrokeCap(Paint.Cap.ROUND);
-
-            mAnalogTickPaint = new Paint();
-            mAnalogTickPaint.setARGB(100, 255, 255, 255);
-            mAnalogTickPaint.setStrokeWidth(2.f);
-            mAnalogTickPaint.setAntiAlias(true);
-
             mTime = new Time();
         }
 
@@ -192,10 +172,6 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
             }
             if (mLowBitAmbient) {
                 boolean antiAlias = !inAmbientMode;
-                mAnalogHourPaint.setAntiAlias(antiAlias);
-                mAnalogMinutePaint.setAntiAlias(antiAlias);
-                mAnalogSecondPaint.setAntiAlias(antiAlias);
-                mAnalogTickPaint.setAntiAlias(antiAlias);
             }
             invalidate();
         }
@@ -206,9 +182,6 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
             boolean inMuteMode = (interruptionFilter == WatchFaceService.INTERRUPTION_FILTER_NONE);
             if (mMute != inMuteMode) {
                 mMute = inMuteMode;
-                mAnalogHourPaint.setAlpha(inMuteMode ? 100 : 255);
-                mAnalogMinutePaint.setAlpha(inMuteMode ? 100 : 255);
-                mAnalogSecondPaint.setAlpha(inMuteMode ? 80 : 255);
                 invalidate();
             }
         }
@@ -230,6 +203,19 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
 
             mDigitalActiveTimePaint.setTextSize((int) (width / 3.5));
             mDigitalAmbientTimePaint.setTextSize((int) (width / 3.5));
+
+            if (!isInAmbientMode()) {
+                // Draw the background, scaled to fit.
+                if (mBackgroundScaledBitmap == null
+                        || mBackgroundScaledBitmap.getWidth() != width
+                        || mBackgroundScaledBitmap.getHeight() != height) {
+                    mBackgroundScaledBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap,
+                            width, height, true /* filter */);
+                }
+                canvas.drawBitmap(mBackgroundScaledBitmap, 0, 0, null);
+            } else {
+                canvas.drawRect(0,0,width,height, mBackgroundPaint);
+            }
 
             // Find the center. Ignore the window insets so that, on round watches with a
             // "chin", the watch face is centered on the entire screen, not just the usable
