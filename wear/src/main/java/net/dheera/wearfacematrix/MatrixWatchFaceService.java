@@ -5,11 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
@@ -18,7 +21,6 @@ import android.text.format.DateFormat;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.SurfaceHolder;
-
 import java.util.Random;
 import java.util.TimeZone;
 
@@ -31,6 +33,8 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
     }
 
     private class Engine extends CanvasWatchFaceService.Engine {
+
+
 
         private final int mSettingsNumRows = 23;
         private int mMatrixBaseColor = Color.GREEN;
@@ -48,7 +52,30 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
         boolean mMute;
         Time mTime;
 
-        private final String[] matrixChars = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
+/*
+
+digital.ttf
+ds_digib.ttf
+led_counter.ttf
+matrix.ttf
+miltown2.ttf
+mouseledumod.ttf
+orbitron_medium.otf
+pixellcd_7.ttf
+subwayticker.ttf
+
+*/
+        boolean digital;
+        boolean ds_digib;
+        boolean led_counter;
+        boolean matrix;
+        boolean miltown2;
+        boolean mouseledumod;
+        boolean orbitron_medium;
+        boolean pixellcd_7;
+        boolean subwayticker;
+
+        private final String[] matrixChars = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
                 "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2", "3", "4",
                 "5", "6", "7", "8", "9", "@", "$", "&", "%", "(", ")", "*", "%", "!", "#", "ア", "イ", "ウ", "エ",
                 "オ", "カ", "キ", "ク", "ケ", "コ", "サ", "シ", "ス", "セ", "ソ", "タ", "チ", "ツ", "テ", "ト",
@@ -59,6 +86,7 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
 
         private int mCharWidth;
         private int mXOffset;
+
 
         final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
             @Override
@@ -74,6 +102,79 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
 
         Paint mBackgroundPaint;
 
+        Bitmap mBackgroundBitmap;
+        Bitmap mBackgroundScaledBitmap;
+
+        public void loadValues() {
+            Context context = getApplicationContext();
+
+            digital = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.DIGITAL,false);
+            ds_digib = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.DS_DIGIB,false);
+            led_counter = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.LED_COUNTER,false);
+            matrix = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.MATRIX,false);
+            miltown2 = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.MILTOWN2,false);
+            mouseledumod = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.MOUSELEDUMOD,false);
+            orbitron_medium = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.ORBITRON_MEDIUM,false);
+            pixellcd_7 = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.PIXELLCD_7,false);
+            subwayticker = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.SUBWAYTICKER, true);
+
+
+            Resources resources = MatrixWatchFaceService.this.getResources();
+            if (digital) {
+                mDigitalActiveTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "digital.ttf"));
+            }
+            if (ds_digib) {
+                mDigitalActiveTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "ds_digib.ttf"));
+            }
+            if (led_counter) {
+                mDigitalActiveTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "led_counter.ttf"));
+            }
+            if (matrix) {
+                mDigitalActiveTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "matrix.ttf"));
+            }
+            if (mouseledumod) {
+                mDigitalActiveTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "mouseledumod.ttf"));
+            }
+            if (orbitron_medium) {
+                mDigitalActiveTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "orbitron_medium.otf"));
+            }
+            if (pixellcd_7) {
+                mDigitalActiveTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "pixellcd_7.ttf"));
+            }
+            if (subwayticker) {
+                mDigitalActiveTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "subwayticker.ttf"));
+            }
+
+            if (digital) {
+                mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "digital.ttf"));
+            }
+            if (ds_digib) {
+                mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "ds_digib.ttf"));
+            }
+            if (led_counter) {
+                mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "led_counter.ttf"));
+            }
+            if (matrix) {
+                mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "matrix.ttf"));
+            }
+            if (mouseledumod) {
+                mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "mouseledumod.ttf"));
+            }
+            if (orbitron_medium) {
+                mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "orbitron_medium.otf"));
+            }
+            if (pixellcd_7) {
+                mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "pixellcd_7.ttf"));
+            }
+            if (subwayticker) {
+                mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "subwayticker.ttf"));
+            }
+
+
+        }
+
+
+
         @Override
         public void onCreate(SurfaceHolder holder) {
             if (Log.isLoggable(TAG, Log.DEBUG)) {
@@ -88,12 +189,27 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
                     .build());
 
             Resources resources = MatrixWatchFaceService.this.getResources();
+            Drawable backgroundDrawable = resources.getDrawable(R.drawable.bg);
+            mBackgroundBitmap = ((BitmapDrawable) backgroundDrawable).getBitmap();
+
+            Context context = getApplicationContext();
+
+            digital = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.DIGITAL,false);
+            ds_digib = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.DS_DIGIB,false);
+            led_counter = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.LED_COUNTER,false);
+            matrix = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.MATRIX,false);
+            miltown2 = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.MILTOWN2,false);
+            mouseledumod = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.MOUSELEDUMOD,false);
+            orbitron_medium = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.ORBITRON_MEDIUM,false);
+            pixellcd_7 = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.PIXELLCD_7,false);
+            subwayticker = MatrixWatchFaceSettings.getBoolean(context, MatrixWatchFaceSettings.SUBWAYTICKER, true);
+
 
             /*Point size = new Point();
             getWindowManager().getDefaultDisplay().getSize(size);*/
 
             int i, j;
-            for(i = 0; i <=5 ; i++) {
+            for (i = 0; i <= 5; i++) {
                 mMatrixPaints[i] = new Paint();
                 mMatrixPaints[i].setColor(Color.rgb(0, i * 32, 0));
                 /*mMatrixPaints[i].setColor(
@@ -121,19 +237,79 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
             mDigitalActiveTimePaint.setAntiAlias(true);
             // mDigitalActiveTimePaint.setStyle(Paint.Style.STROKE);
             // mDigitalActiveTimePaint.setTypeface(Typeface.createFromFile(new File(R.raw.orbitron_medium)));
-            mDigitalActiveTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "miltown2.ttf"));
+
+            /*
+            digital.ttf
+            ds_digib.ttf
+            led_counter.ttf
+            matrix.ttf
+            miltown2.ttf
+            mouseledumod.ttf
+            orbitron_medium.otf
+            pixellcd_7.ttf
+            subwayticker.ttf
+              */
+            if (digital) {
+                mDigitalActiveTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "digital.ttf"));
+            }
+            if (ds_digib) {
+                mDigitalActiveTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "ds_digib.ttf"));
+            }
+            if (led_counter) {
+                mDigitalActiveTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "led_counter.ttf"));
+            }
+            if (matrix) {
+                mDigitalActiveTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "matrix.ttf"));
+            }
+            if (mouseledumod) {
+                mDigitalActiveTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "mouseledumod.ttf"));
+            }
+            if (orbitron_medium) {
+                mDigitalActiveTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "orbitron_medium.otf"));
+            }
+            if (pixellcd_7) {
+                mDigitalActiveTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "pixellcd_7.ttf"));
+            }
+            if (subwayticker) {
+                mDigitalActiveTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "subwayticker.ttf"));
+            }
             mDigitalActiveTimePaint.setShadowLayer(20f, 0f, 0f, Color.GREEN);
 
             mDigitalAmbientTimePaint = new Paint();
             mDigitalAmbientTimePaint.setColor(Color.rgb(255, 255, 255));
             mDigitalAmbientTimePaint.setTextAlign(Paint.Align.CENTER);
             mDigitalAmbientTimePaint.setAntiAlias(true);
-            mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "miltown2.ttf"));
 
-            for(i = 0; i < mSettingsNumRows; i++) {
+
+            if (digital) {
+                mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "digital.ttf"));
+            }
+            if (ds_digib) {
+                mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "ds_digib.ttf"));
+            }
+            if (led_counter) {
+                mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "led_counter.ttf"));
+            }
+            if (matrix) {
+                mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "matrix.ttf"));
+            }
+            if (mouseledumod) {
+                mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "mouseledumod.ttf"));
+            }
+            if (orbitron_medium) {
+                mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "orbitron_medium.otf"));
+            }
+            if (pixellcd_7) {
+                mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "pixellcd_7.ttf"));
+            }
+            if (subwayticker) {
+                mDigitalAmbientTimePaint.setTypeface(Typeface.createFromAsset(resources.getAssets(), "subwayticker.ttf"));
+            }
+
+            for (i = 0; i < mSettingsNumRows; i++) {
                 for (j = 0; j < mSettingsNumRows; j++) {
                     mMatrixValues[i][j] = matrixChars[random.nextInt(matrixChars.length)];
-                    mMatrixIntensities[i][j]=0;
+                    mMatrixIntensities[i][j] = 0;
                 }
             }
 
@@ -220,22 +396,74 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
             }
             long now = System.currentTimeMillis();
             mTime.set(now);
-            //int milliseconds = (int) (now % 1000);
+            int milliseconds = (int) (now % 1000);
 
             int width = bounds.width();
             int height = bounds.height();
 
             mCharWidth = width / mSettingsNumRows + 1;
-            mXOffset = (width - mCharWidth * mSettingsNumRows)/2;
+            mXOffset = (width - mCharWidth * mSettingsNumRows) / 2;
 
             mDigitalActiveTimePaint.setTextSize((int) (width / 3.5));
             mDigitalAmbientTimePaint.setTextSize((int) (width / 3.5));
+
+            if (!isInAmbientMode()) {
+                // Draw the background, scaled to fit.
+                if (mBackgroundScaledBitmap == null
+                        || mBackgroundScaledBitmap.getWidth() != width
+                        || mBackgroundScaledBitmap.getHeight() != height) {
+                    mBackgroundScaledBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap,
+                            width, height, true /* filter */);
+                }
+                canvas.drawBitmap(mBackgroundScaledBitmap, 0, 0, null);
+            } else {
+                canvas.drawRect(0, 0, width, height, mBackgroundPaint);
+            }
 
             // Find the center. Ignore the window insets so that, on round watches with a
             // "chin", the watch face is centered on the entire screen, not just the usable
             // portion.
             float centerX = width / 2f;
             float centerY = height / 2f;
+
+            /*
+            // Draw the ticks.
+            float innerTickRadius = centerX - 10;
+            float outerTickRadius = centerX;
+            for (int tickIndex = 0; tickIndex < 12; tickIndex++) {
+                float tickRot = (float) (tickIndex * Math.PI * 2 / 12);
+                float innerX = (float) Math.sin(tickRot) * innerTickRadius;
+                float innerY = (float) -Math.cos(tickRot) * innerTickRadius;
+                float outerX = (float) Math.sin(tickRot) * outerTickRadius;
+                float outerY = (float) -Math.cos(tickRot) * outerTickRadius;
+                canvas.drawLine(centerX + innerX, centerY + innerY,
+                        centerX + outerX, centerY + outerY, mAnalogTickPaint);
+            }
+
+            float seconds = mTime.second + milliseconds / 1000f;
+            float secRot = seconds / 30f * (float) Math.PI;
+            int minutes = mTime.minute;
+            float minRot = minutes / 30f * (float) Math.PI;
+            float hrRot = ((mTime.hour + (minutes / 60f)) / 6f ) * (float) Math.PI;
+
+            float secLength = centerX - 20;
+            float minLength = centerX - 40;
+            float hrLength = centerX - 80;
+
+            if (!isInAmbientMode()) {
+                float secX = (float) Math.sin(secRot) * secLength;
+                float secY = (float) -Math.cos(secRot) * secLength;
+                canvas.drawLine(centerX, centerY, centerX + secX, centerY + secY, mAnalogSecondPaint);
+            }
+
+            float minX = (float) Math.sin(minRot) * minLength;
+            float minY = (float) -Math.cos(minRot) * minLength;
+            canvas.drawLine(centerX, centerY, centerX + minX, centerY + minY, mAnalogMinutePaint);
+
+            float hrX = (float) Math.sin(hrRot) * hrLength;
+            float hrY = (float) -Math.cos(hrRot) * hrLength;
+            canvas.drawLine(centerX, centerY, centerX + hrX, centerY + hrY, mAnalogHourPaint);
+            */
 
             // Draw the matrix background
 
@@ -265,9 +493,9 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
             }
 
             int displayHour = mTime.hour;
-            if(!DateFormat.is24HourFormat(getBaseContext())) {
+            if (!DateFormat.is24HourFormat(getBaseContext())) {
                 displayHour = displayHour % 12;
-                if(displayHour == 0) displayHour = 12;
+                if (displayHour == 0) displayHour = 12;
             }
 
             if (!isInAmbientMode()) {
@@ -289,6 +517,7 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
             super.onVisibilityChanged(visible);
 
             if (visible) {
+                loadValues();
                 registerReceiver();
 
                 // Update time zone in case it changed while we weren't visible.
@@ -297,7 +526,9 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
                 invalidate();
             } else {
                 unregisterReceiver();
+
             }
+
         }
 
         private void registerReceiver() {
@@ -316,6 +547,10 @@ public class MatrixWatchFaceService extends CanvasWatchFaceService {
             mRegisteredTimeZoneReceiver = false;
             MatrixWatchFaceService.this.unregisterReceiver(mTimeZoneReceiver);
         }
+
+
+
     }
 
 }
+

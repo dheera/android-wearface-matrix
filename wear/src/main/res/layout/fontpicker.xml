@@ -1,0 +1,130 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Pick one font style"
+        android:id="@+id/textView"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp" />
+<!--
+digital.ttf
+ds_digib.ttf
+led_counter.ttf
+matrix.ttf
+miltown2.ttf
+mouseledumod.ttf
+orbitron_medium.otf
+pixellcd_7.ttf
+subwayticker.ttf
+-->
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="digital"
+        android:id="@+id/digital"
+        android:layout_below="@+id/textView"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView"
+        android:typeface="monospace" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ds_digib"
+        android:id="@+id/ds_digib"
+        android:layout_below="@+id/digital"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView"
+        android:typeface="monospace" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="led_counter"
+        android:id="@+id/led_counter"
+        android:layout_below="@+id/ds_digib"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView"
+        android:typeface="monospace" />
+        
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Matrix Font"
+        android:id="@+id/matrix"
+        android:layout_below="@+id/led_counter"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView"
+        android:typeface="monospace" />
+        
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="miltown2"
+        android:id="@+id/miltown2"
+        android:layout_below="@+id/matrix"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView"
+        android:typeface="monospace" />
+        
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="mouseledumod"
+        android:id="@+id/mouseledumod"
+        android:layout_below="@+id/miltown2"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView"
+        android:typeface="monospace" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="orbitron_medium"
+        android:id="@+id/orbitron_medium"
+        android:layout_below="@+id/mouseledumod"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView"
+        android:typeface="monospace" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="pixellcd_7"
+        android:id="@+id/pixellcd_7"
+        android:layout_below="@+id/orbitron_medium"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView"
+        android:typeface="monospace" />
+        
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="subwayticker"
+        android:id="@+id/subwayticker"
+        android:layout_below="@+id/pixellcd_7"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView"
+        android:typeface="monospace" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Apply font to your watch face"
+        android:id="@+id/applybutton"
+        android:layout_below="@+id/subwayticker"
+        android:typeface="monospace"
+        android:layout_centerHorizontal="true" />
+
+
+</RelativeLayout>
+</ScrollView>
